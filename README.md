@@ -6,22 +6,22 @@ reports and relay them to metarace telegraph as JSON encoded objects.
 Configuration is via metarace sysconf section 'airtrackrelay' with the
 following keys:
 
- key: (type) Description [default]
- ---
- topic : (string) MQTT relay topic ['tracking/data']
- port : (int) UDP listen port [1911]
+key	|	(type) Description [default]
+---	|	---
+topic	|	(string) MQTT relay topic ['tracking/data']
+port	|	(int) UDP listen port [1911]
 
 Trackers imeis are read from the section 'tracking' under the
 key 'devices', which is a map of device ids to a dict object:
 
- key: (type) Description [default]
- ---
- imei : (string) Device IMEI
- label : (string) Text label [None]
- phone : (string) Phone number for SMS commands [None]
- type : (string) Device type
+key	|	(type) Description [default]
+---	|	---
+imei	|	(string) Device IMEI
+label	|	(string) Text label [None]
+phone	|	(string) Phone number for SMS commands [None]
+type	|	(string) Device type
 
- Notes:
+Notes:
 
    - No authentication is performed
    - All datagrams are delivered in clear text
