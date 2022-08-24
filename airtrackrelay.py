@@ -181,12 +181,13 @@ class app:
         self._t.start()
 
         # blocking read from UDP socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.bind((u'', self._port))
+        s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        s.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        s.bind(('::', self._port))
         try:
             while True:
                 b, addr = s.recvfrom(4096)
-                _log.debug('RECV: %r', b)
+                _log.debug('RECV: %r %r', addr, b)
                 self._recvmsg(b)
         finally:
             self._t.wait()
