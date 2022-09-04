@@ -8,7 +8,7 @@ Messages relayed to mqtt:
 
    - +ACK : Command acknowledge, type: 'drdack'
    - +RESP, +BUFF:
-     - GTFRI, GTFRL : Location report, type: 'drdpos'
+     - GTFRI, GTRTL : Location report, type: 'drdpos'
      - GTINF : Information report, type: 'drdstat'
 
 All other Air Interface messages are logged, and discarded.
@@ -34,7 +34,7 @@ Example config:
 
 	{
 	 "airtrackrelay": {
-	  "port": 123456,
+	  "port": 12345,
 	  "topic": "tracking/data"
 	 },
 	 "tracking": {
@@ -69,9 +69,6 @@ Example Ack Message:
 Notes:
 
    - Tracker type is currently ignored, GL300W is assumed
-   - No authentication is performed
-   - Trackers to not provide any mechanism to prevent replay,
-     modification or corruption
    - Message contents are not verified, parsed or converted
 
 
