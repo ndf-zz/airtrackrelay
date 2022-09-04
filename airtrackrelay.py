@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MIT
 """airtrackrelay
 
- Read Quectel GPS tracker "Air Interface" reports and relay them
- to metarace telegraph as JSON encoded objects.
+ Read Quectel GPS tracker plain text "Air Interface" reports
+ and relay them to metarace telegraph as JSON encoded objects.
 
 """
 
@@ -10,7 +10,7 @@ import sys
 import socket
 import logging
 import metarace
-from metarace import strops
+from metarace.strops import confopt_posint
 from metarace.telegraph import telegraph
 
 _LOGLEVEL = logging.DEBUG
@@ -42,14 +42,13 @@ class app:
         if metarace.sysconf.has_option('airtrackrelay', 'port'):
             self._port = metarace.sysconf.get_posint('airtrackrelay', 'port',
                                                      _PORT)
-
         if metarace.sysconf.has_option('tracking', 'devices'):
             drds = metarace.sysconf.get('tracking', 'devices')
             for drd in drds:
                 self._imeis[drds[drd]['imei']] = drd
             _log.debug('%s configured drds: %r', len(self._imeis), self._imeis)
 
-    def _glack(self, drd, msg):
+    def _glack(self, drd, msg, ctype):
         """Process an ACK message"""
         ctm = msg[-2]
         cid = msg[-3].upper()
@@ -90,7 +89,8 @@ class app:
 
     def _glfri(self, drd, msg, buff):
         """Process FRI/RTL message"""
-        msgcnt = strops.confopt_posint(msg[6], 1)
+        _log.debug('FRI/RTL: %r', msg)
+        msgcnt = confopt_posint(msg[6], 1)
         oft = 0
         while oft < msgcnt:
             sp = oft * _FRILEN + _FRIOFT
@@ -103,12 +103,12 @@ class app:
                 utc = msg[sp + 6]  # GPS fix time in UTC
                 batt = msg[-3]  # battery level ??
                 sutc = msg[-2]  # message send time in UTC
-                mode = '0'
+                fix = False
                 if hdop != '0':
-                    mode = '3'  # hack the mode based on fix
+                    fix = True
                 obj = {
                     'type': 'drdpos',
-                    'mode': mode,
+                    'fix': fix,
                     'lat': lat,
                     'lon': lon,
                     'elev': elev,
@@ -140,7 +140,7 @@ class app:
                 return None
 
             if mtype == u'+ACK' and len(msg) > 6:
-                self._glack(drd, msg)
+                self._glack(drd, msg, ctype)
             elif mtype in ['+RESP', '+BUFF']:
                 buff = mtype == '+BUFF'
                 if ctype in ['GTFRI', 'GTRTL'] and len(msg) > 20:
@@ -148,7 +148,7 @@ class app:
                 elif ctype in ['GTINF'] and len(msg) > 24:
                     self._glinf(drd, msg, buff)
                 else:
-                    _log.debug('Message not relayed: %r', msg)
+                    _log.debug('Message from %r not relayed: %r', drd, msg)
             else:
                 _log.debug('Invalid message type: %r', mtype)
         else:
@@ -156,22 +156,19 @@ class app:
 
     def _recvmsg(self, buf):
         """Receive messages from buf"""
-        sepa = b'$'
-        if b'\xa4' in buf:
-            sepa = b'\xa4'
         try:
-            while sepa in buf:
-                cmd, sep, buf = buf.partition(sepa)
-                if cmd:
-                    msg = (cmd + sep).decode('iso8859-1', 'ignore').split(',')
-                    if msg[0][0:4] in [u'+ACK', u'+RES', u'+BUF']:
-                        self._glmsg(msg)
-                    else:
-                        _log.debug('Unrecognised message:  %r', msg)
+            if buf.endswith(b'$'):
+                if buf.startswith(b'+RESP') or buf.startswith(
+                        b'+BUFF') or buf.startswith(b'+ACK'):
+                    msg = buf.decode('iso8859-1').split(',')
+                    self._glmsg(msg)
+                else:
+                    _log.debug('Unrecognised message:  %r', buf)
+            else:
+                _log.debug('Missing end character:  %r', buf)
+
         except Exception as e:
             _log.error('%s reading message: %s', e.__class__.__name__, e)
-        if buf:
-            _log.debug('Discarding junk data: %r', buf)
 
     def run(self):
         _log.info('Starting')
@@ -184,6 +181,7 @@ class app:
         s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         s.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
         s.bind(('::', self._port))
+        _log.debug('Listening on UDP port %r', self._port)
         try:
             while True:
                 b, addr = s.recvfrom(4096)
