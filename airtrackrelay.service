@@ -1,5 +1,5 @@
 [Unit]
-Description=GPS Tracker Relay
+Description=UDP GPS Tracker Relay
 Wants=network.target
 After=network.target
 
