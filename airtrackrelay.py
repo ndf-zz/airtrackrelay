@@ -143,7 +143,7 @@ class app:
                 self._glack(drd, msg, ctype)
             elif mtype in ['+RESP', '+BUFF']:
                 buff = mtype == '+BUFF'
-                if ctype in ['GTFRI', 'GTRTL'] and len(msg) > 20:
+                if ctype in ['GTFRI', 'GTRTL', 'GTSOS'] and len(msg) > 20:
                     self._glfri(drd, msg, buff)
                 elif ctype in ['GTINF'] and len(msg) > 24:
                     self._glinf(drd, msg, buff)
