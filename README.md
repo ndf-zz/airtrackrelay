@@ -20,9 +20,9 @@ key	|	(type) Description [default]
 ---	|	---
 topic	|	(string) MQTT relay topic ['tracking/data']
 port	|	(int) UDP listen port [1911]
-k1	|	(string) Beaker K1, 128 bit hex string [null]
-k2	|	(string) Beaker K2, 128 bit hex string [null]
-uid	|	(int32) Beaker uid/config id [0x45670123]
+k1	|	(string) Beaker K1, 128 bit hex string
+k2	|	(string) Beaker K2, 128 bit hex string
+uid	|	(int32) Beaker uid/config id [0]
 
 
 Tracker imeis are read from the section 'tracking' under the
@@ -40,8 +40,9 @@ Example config:
 	 "airtrackrelay": {
 	  "port": 12345,
 	  "topic": "tracking/data",
-          "key": "000102030405060708090a0b0c0d0e0f",
-          "cbcsig": 1234567890
+	  "k1": "000102030405060708090a0b0c0d0e0f",
+	  "k2": "f0e0d0c0b0a090807060504030201000",
+	  "uid": 1234567890
 	 },
 	 "tracking": {
 	  "devices": {

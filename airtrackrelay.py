@@ -30,7 +30,7 @@ _ZEROBLOCK = b'\x00' * 16
 _KEY1 = b'0123456789abcdef'
 _KEY2 = b'89abcdef01234567'
 # default beaker uid / config id
-_UID = 0x45670123
+_UID = 0x0
 
 
 class app:
@@ -103,7 +103,6 @@ class app:
             'voltage': volt,
             'battery': batt,
             'charging': chrg,
-            'buffered': buff,
             'sendtime': sutc
         }
         _log.debug('INF: %r', obj)
@@ -123,14 +122,10 @@ class app:
                 lng = msg[sp + 4]
                 lat = msg[sp + 5]
                 utc = msg[sp + 6]  # GPS fix time in UTC
-                batt = msg[-3]  # battery level ??
-                sutc = msg[-2]  # message send time in UTC
-                fix = False
-                if hdop != '0':
-                    fix = True
+                batt = msg[-3]  # battery level
+                fix = True
                 obj = {
                     'type': 'drdpos',
-                    'fix': fix,
                     'lat': lat,
                     'lng': lng,
                     'elev': elev,
@@ -138,7 +133,6 @@ class app:
                     'drd': drd,
                     'fixtime': utc,
                     'battery': batt,
-                    'buffered': buff,
                     'flags': flags
                 }
                 _log.debug('LOC: %r', obj)
@@ -204,14 +198,12 @@ class app:
                 flags = infoval >> 8
                 obj = {
                     'type': 'drdpos',
-                    'fix': True,
                     'lat': '%0.6f' % (lat),
                     'lng': '%0.6f' % (lng),
                     'speed': speed,
                     'drd': drd,
                     'fixtime': utc,
                     'battery': battery,
-                    'buffered': False,
                     'flags': flags
                 }
                 _log.debug('LOC: %r', obj)
