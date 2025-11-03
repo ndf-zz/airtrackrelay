@@ -57,7 +57,7 @@ Example config:
 Example Info Message:
 
 	{"type": "drdstat", "drd": "bob", "devstate": "41", "rssi": "13",
-	 "voltage": "4.08", "battery": "94", "charging": "0", "buffered": false,
+	 "voltage": "4.08", "battery": "94", "charging": "0",
 	 "sendtime": "20220101023424" }
 
 Example Ack Message:
@@ -65,20 +65,11 @@ Example Ack Message:
 	{"type": "drdack", "drd": "gem", "ctype": "GTFRI", "cid": "1A3D",
 	 "sendtime": "20220101031607", "req": ""}
 
-Example GL3xx Location Message:
+Example GL3xx/Beaker Location Message:
 
-	{"type": "drdpos", "fix": true, "lat": "-13.567891",
-	 "lng": "101.367815", "elev": "22.6", "speed": "12.7",
-	 "drd": "gem", "fixtime": "20220101022231",
-	 "buffered": false, "battery": "94", "flags": 0}
-
-Example Beaker Location Message:
-
-	{"type": "drdpos", "fix": true, "lat": "-12.345666",
-	 "lng": "101.123555", "speed": "0.0", "drd": "bob",
-	 "fixtime": "2023-01-13T03:12:49.00Z", "battery": "100",
-	 "buffered": false, "flags": 255}
-
+	{"type": "drdpos", "lat": "-13.567891", "lng": "101.367815",
+	 "elev": "22.6", "speed": "12.7", "drd": "gem",
+	 "fixtime": "20220101022231", "battery": "94", "flags": 0}
 
 
 ## Requirements

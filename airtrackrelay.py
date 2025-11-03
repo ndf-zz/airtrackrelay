@@ -5,6 +5,7 @@
  as JSON encoded objects.
 
 """
+__version__='1.0.4'
 
 import sys
 import socket
@@ -245,16 +246,17 @@ class app:
     def _recvmsg(self, buf):
         """Receive messages from buf"""
         try:
-            if len(buf) == 64:
-                # assume AES encrypted beaker format
-                self._beaker(buf)
-            elif buf.endswith(b'$'):
+            #_log.debug('recv: %r', buf)
+            if buf.endswith(b'$') and buf.startswith(b'+'):
                 if buf.startswith(b'+RESP') or buf.startswith(
                         b'+BUFF') or buf.startswith(b'+ACK'):
                     msg = buf.decode('iso8859-1').split(',')
                     self._glmsg(msg)
                 else:
                     _log.debug('Unrecognised message:  %r', buf)
+            elif len(buf) == 64:
+                # assume AES encrypted beaker format
+                self._beaker(buf)
             else:
                 _log.debug('Unrecognised message:  %r', buf)
 

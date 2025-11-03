@@ -6,8 +6,8 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=aitrackrelay
-User=airtrack
-WorkingDirectory=~
+User=user
+WorkingDirectory=/home/user
 
 [Install]
 WantedBy=multi-user.target
